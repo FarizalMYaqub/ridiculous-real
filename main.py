@@ -13,8 +13,15 @@ PITCH = (
     "only when they refer a friend, turning lost laundry into a referral engine."
 )
 
-OUTPUT_PATH = "/output/entry.txt"
+OUTPUT_PATH = os.environ.get("ENTRY_OUTPUT", "/output/entry.txt")
 MAX_CHARS = 200
+
+
+def verify(pitch: str) -> None:
+    """Re-read what was written and confirm it round-trips byte-identical."""
+    with open(OUTPUT_PATH, "r", encoding="utf-8") as f:
+        written = f.read()
+    assert written == pitch + "\n", "entry.txt does not match the pitch"
 
 
 def main() -> None:
@@ -25,6 +32,7 @@ def main() -> None:
     os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
     with open(OUTPUT_PATH, "w", encoding="utf-8") as f:
         f.write(pitch + "\n")
+    verify(pitch)
     print(f"wrote {len(pitch)} chars to {OUTPUT_PATH}")
 
 
